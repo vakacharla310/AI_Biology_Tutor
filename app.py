@@ -1,30 +1,44 @@
+
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
+from pathlib import Path
 
 # ---------------- CONFIG ----------------
+
+BASE_DIR = Path(__file__).parent
+
+st.set_page_config(
+    page_title="AI Biology Tutor",
+    layout="wide"
+)
+
 API_KEY = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=API_KEY)
+
 model = genai.GenerativeModel("gemini-2.5-flash")
-st.set_page_config(page_title="AI Biology Tutor", layout="wide")
+
 st.title("🧠 AI Biology Interactive Tutor")
 
+
 # ---------------- CACHE ----------------
+
 if "ai_cache" not in st.session_state:
     st.session_state.ai_cache = {}
 
+
 # ---------------- SAFE AI FUNCTION ----------------
+
 def safe_ai(prompt, key):
 
-    # Return cached response if already generated
     if key in st.session_state.ai_cache:
         return st.session_state.ai_cache[key]
 
     try:
         with st.spinner("AI is thinking... 🧠"):
-            response = model.generate_content(prompt)
 
-        result = response.text
+            response = model.generate_content(prompt)
+            result = response.text
 
         st.session_state.ai_cache[key] = result
 
@@ -33,14 +47,25 @@ def safe_ai(prompt, key):
     except Exception as e:
         return f"⚠️ AI Error: {e}"
 
+
 # ---------------- MENU ----------------
+
 menu = st.sidebar.selectbox(
     "Choose Module",
-    ["Home", "Lung Explorer", "Heart Explorer", "Cell Explorer", "Quiz"]
+    [
+        "Home",
+        "Lung Explorer",
+        "Heart Explorer",
+        "Cell Explorer",
+        "Quiz"
+    ]
 )
 
+
 # ---------------- HOME ----------------
+
 if menu == "Home":
+
     st.header("Welcome 👋")
 
     st.write(
@@ -49,24 +74,26 @@ if menu == "Home":
     )
 
     st.success("Features")
+
     st.write("✔ AI Explanations")
     st.write("✔ Interactive 3D Models")
     st.write("✔ Biology Quiz")
     st.write("✔ Visual Learning")
 
+
 # ---------------- LUNG ----------------
+
 elif menu == "Lung Explorer":
 
     st.header("🫁 Human Lung Explorer")
 
-    img = Image.open(
-        r"C:/Users/punna/OneDrive/Desktop/AI_Biology_Tutor/images/lung.jpg.jpeg"
-    )
+    img = Image.open(BASE_DIR / "images" / "lung.jpg.jpeg")
     st.image(img, caption="Human Lung Diagram")
 
     st.caption("🖱️ Drag to rotate • Scroll to zoom")
 
     if st.button("Explain Lung"):
+
         lung_text = safe_ai(
             """
             Explain human lungs in detailed textbook style.
@@ -105,19 +132,20 @@ elif menu == "Lung Explorer":
         height=520
     )
 
+
 # ---------------- HEART ----------------
+
 elif menu == "Heart Explorer":
 
     st.header("❤️ Human Heart Explorer")
 
-    img = Image.open(
-        r"C:/Users/punna/OneDrive/Desktop/AI_Biology_Tutor/images/heart.jpg.jpeg"
-    )
+    img = Image.open(BASE_DIR / "images" / "heart.jpg.jpeg")
     st.image(img, caption="Human Heart Diagram")
 
     st.caption("🖱️ Drag to rotate • Scroll to zoom")
 
     if st.button("Explain Heart"):
+
         heart_text = safe_ai(
             """
             Explain the human heart in detailed textbook style.
@@ -157,19 +185,20 @@ elif menu == "Heart Explorer":
         height=520
     )
 
+
 # ---------------- CELL ----------------
+
 elif menu == "Cell Explorer":
 
     st.header("🧬 Cell Structure Explorer")
 
-    img = Image.open(
-        r"C:/Users/punna/OneDrive/Desktop/AI_Biology_Tutor/images/cell.jpg.webp"
-    )
+    img = Image.open(BASE_DIR / "images" / "cell.jpg.webp")
     st.image(img, caption="Cell Diagram")
 
     st.caption("🖱️ Drag to rotate • Scroll to zoom")
 
     if st.button("Explain Cell"):
+
         cell_text = safe_ai(
             """
             Explain cell structure in detail.
@@ -200,7 +229,7 @@ elif menu == "Cell Explorer":
     st.components.v1.html(
         """
         <iframe width="100%" height="500"
-        src="https://sketchfab.com/models/1f37ec86999a4c9289de207b9ca7435a/embed"
+        src="https://sketchfab.com/models/1f37ec86999a4c9289de207b9ca7435/embed"
         frameborder="0"
         allowfullscreen>
         </iframe>
@@ -208,7 +237,9 @@ elif menu == "Cell Explorer":
         height=520
     )
 
+
 # ---------------- QUIZ ----------------
+
 elif menu == "Quiz":
 
     st.header("🎯 Biology Quiz")
